@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>TAGO</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: #e5e7eb;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 0 10px;
+      box-sizing: border-box;
+    }
+    #main-container {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      max-width: 1200px;
+      height: 80%;
+      gap: 20px;
+      justify-content: center;
+      align-items: center;
+    }
+    #tago-side {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      text-align: center;
+      padding-top: 20px;
+    }
+    #tago-side img {
+      max-width: 250px;
+      width: 100%;
+      height: auto;
+      margin-bottom: 20px;
+    }
+    #tago-side h1 {
+      font-size: 40px;
+      margin: 0;
+      color: #0f172a;
+    }
+    #tago-side h2 {
+      font-size: 18px;
+      margin-top: 10px;
+      color: #475569;
+      font-weight: normal;
+      text-align: center;
+    }
+    #chat-container {
+      flex: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      width: 100%;
+    }
+    #chatbox {
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 6px 25px rgba(0,0,0,0.15);
+      overflow: hidden;
+      width: 100%;
+      max-width: 600px;
+      height: 400px;
+      margin-bottom: 60px;
+      flex-shrink: 0;
+    }
+    #messages {
+      flex: 1;
+      padding: 10px 15px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column-reverse;
+      scroll-behavior: smooth;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+    .message {
+      margin-bottom: 10px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      max-width: 80%;
+      word-wrap: break-word;
+      position: relative;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .message.user {
+      background: #3b82f6;
+      color: #fff;
+      align-self: flex-end;
+    }
+    .message.bot {
+      background: #f1f5f9;
+      color: #1e293b;
+      align-self: flex-start;
+    }
+    .message.bot:hover::after {
+      content: "📋";
+      position: absolute;
+      right: 5px;
+      top: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in {
+      animation: fadeIn 0.5s ease-out forwards;
+    }
+    #input {
+      display: flex;
+      border-top: 1px solid #cbd5e1;
+    }
+    #input input {
+      flex: 1;
+      padding: 12px;
+      font-size: 15px;
+      border: none;
+    }
+    #input button {
+      padding: 12px 18px;
+      font-size: 15px;
+      border: none;
+      background: #3b82f6;
+      color: #fff;
+      cursor: pointer;
+    }
+    #input input:focus {
+      outline: none;
+    }
+    .loader {
+      display: inline-block;
+      font-size: 20px;
+      letter-spacing: 3px;
+      animation: blink 1.4s infinite both;
+    }
+    @keyframes blink {
+      0%   { opacity: .2; }
+      20%  { opacity: 1; }
+      100% { opacity: .2; }
+    }
+    footer {
+      text-align: center;
+      font-size: 12px;
+      color: #64748b;
+      width: 100%;
+      max-width: 1200px;
+      padding: 10px 0;
+      margin-top: 0;
+    }
+    @media (max-width: 768px) {
+      body { padding-top: 40px; }
+      #main-container {
+        flex-direction: column;
+        width: 100%;
+        padding: 0 10px;
+        align-items: center;
+        height: auto;
+        gap: 10px;
+      }
+      #tago-side img {
+        width: auto !important;
+        height: auto !important;
+        max-width: 140px;
+        max-height: 18vh;
+        margin-bottom: 15px;
+      }
+      #tago-side h1 { font-size: 32px; }
+      #tago-side h2 { font-size: 16px; }
+      #chatbox {
+        width: 100%;
+        height: 300px;
+        margin-bottom: 20px;
+      }
+      footer { font-size: 12px; margin-top: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="main-container">
+    <div id="tago-side">
+      <img src="assets/tago.png" alt="TAGO le robot guitariste">
+      <h1>TAGO</h1>
+      <h2>Disponible 24h/24 pour t'aider dans ton apprentissage. Pose ta question quand tu veux&nbsp;!</h2>
+    </div>
+    <div id="chat-container">
+      <div id="chatbox">
+        <div id="messages"></div>
+        <div id="input">
+          <input type="text" id="userInput" placeholder="Écris ta question...">
+          <button onclick="sendMessage()">Envoyer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer>
+    TAGO est un assistant virtuel créé et entraîné par Samuel dans le but d'apporter une assistance instantanée et cohérente à ses élèves. L'historique de votre conversation sera conservé pour assurer un suivi efficace.
+  </footer>
+  <script>
+    const studentIdKey = 'studentId';
+    let studentId = localStorage.getItem(studentIdKey);
+    if (!studentId) {
+      studentId = 'student-' + Math.random().toString(36).substring(2, 9);
+      localStorage.setItem(studentIdKey, studentId);
+    }
+
+    const messagesDiv = document.getElementById("messages");
+    const input = document.getElementById("userInput");
+    let firstBotMessage = true;
+
+    function addMessage(sender, text, isBot = false) {
+      const msg = document.createElement("div");
+      msg.classList.add("message", isBot ? "bot" : "user");
+      if (isBot && firstBotMessage) {
+        msg.classList.add("fade-in");
+        firstBotMessage = false;
+      }
+      if (isBot) {
+        msg.innerHTML = marked.parse(text);
+        msg.addEventListener("click", () => {
+          navigator.clipboard.writeText(text);
+          alert("Message copié !");
+        });
+      } else {
+        msg.textContent = text;
+      }
+      messagesDiv.prepend(msg);
+    }
+
+    function addLoader() {
+      const loader = document.createElement("div");
+      loader.classList.add("message", "bot");
+      loader.id = "loader";
+      loader.innerHTML = '<span class="loader">...</span>'; // CORRECTION ICI
+      messagesDiv.prepend(loader);
+    }
+
+    function removeLoader() {
+      const loader = document.getElementById("loader");
+      if (loader) loader.remove();
+    }
+
+    async function sendMessage() {
+      const text = input.value.trim();
+      if (!text) return;
+      addMessage("Toi", text, false);
+      input.value = "";
+      addLoader();
+      try {
+        const response = await fetch("/.netlify/functions/relay", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text, studentId: studentId })
+        });
+        const data = await response.json();
+        removeLoader();
+        addMessage("TAGO", data.reply || "Pas de réponse reçue.", true);
+      } catch {
+        removeLoader();
+        addMessage("Erreur", "⚠️ Hmm… je me suis emmêlé les circuits. Peux-tu me renvoyer ta question ?", true);
+      }
+    }
+
+    input.addEventListener("keypress", e => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+      setTimeout(() => {
+        addMessage(
+          "TAGO",
+          "Salut, c'est Tago, ton assistant guitare. Je serai ravi de t'aider aujourd'hui !<br>Pour assurer un suivi efficace, pourrais-tu me donner ton prénom, ton nom et ton e-mail, s’il te plaît ?<br><br><b>Entrez ci-dessous votre prénom, nom et e-mail :</b>",
+          true
+        );
+      }, 1000);
+    });
+  </script>
+</body>
+</html>
